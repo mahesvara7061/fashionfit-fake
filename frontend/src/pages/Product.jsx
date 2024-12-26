@@ -1,16 +1,13 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContext';
-import { assets } from '../assets/assets';
-import RelatedProduct from '../components/RelatedProduct';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
 const Product = () => {
   const { productId } = useParams(); // Access productId from route parameters
-  const { products, addToCart } = useContext(ShopContext); // Access products and addToCart from context
+  const { products } = useContext(ShopContext); // Access products from context
   const [productData, setProductData] = useState(null); // State for product data
-  const [activeTab, setActiveTab] = useState('description'); // State for active tab (Description/Reviews)
 
   const fetchProductData = async () => {
     try {
@@ -66,6 +63,16 @@ const Product = () => {
             alt={productData.ProductTitle || 'Product Image'}
             className="w-full sm:w-[80%] h-auto object-cover border border-gray-300"
           />
+          <button
+            onClick={() => {
+              const htmlFilePath = 'http://127.0.0.1:8080/project/fashionfit-fake/frontend/src/assets/try-on.html'; // Path to the HTML file served on port 8080
+              const productImageUrl = encodeURIComponent(productData.ImageURL);
+              window.location.href = `${htmlFilePath}?productImage=${productImageUrl}`;
+            }}
+            className="bg-blue-500 text-white px-6 py-2 rounded-md mt-4 hover:bg-blue-600"
+          >
+            Try On Now!
+          </button>
         </div>
 
         {/* Product Info Section */}
@@ -76,13 +83,13 @@ const Product = () => {
             {[...Array(4)].map((_, index) => (
               <img
                 key={index}
-                src={assets.star_icon}
+                src="/assets/star_icon.png"
                 alt="Star"
                 className="w-5"
               />
             ))}
             <img
-              src={assets.star_dull_icon}
+              src="/assets/star_dull_icon.png"
               alt="Dull Star"
               className="w-5"
             />
@@ -109,42 +116,6 @@ const Product = () => {
           </div>
         </div>
       </div>
-
-      {/* Description & Reviews Section */}
-      <div className="mt-20">
-        <div className="flex">
-          <button
-            className={`px-5 py-3 text-sm ${
-              activeTab === 'description' ? 'font-bold border-b-2' : ''
-            }`}
-            onClick={() => setActiveTab('description')}
-          >
-            Description
-          </button>
-          <button
-            className={`px-5 py-3 text-sm ${
-              activeTab === 'reviews' ? 'font-bold border-b-2' : ''
-            }`}
-            onClick={() => setActiveTab('reviews')}
-          >
-            Reviews
-          </button>
-        </div>
-        <div className="flex flex-col gap-4 border px-6 py-6 text-sm text-gray-500">
-          {activeTab === 'description' ? (
-            <p>{productData.Description_Paragraph || 'No description available.'}</p>
-          ) : (
-            <p>No reviews yet. Be the first to review this product!</p>
-          )}
-        </div>
-      </div>
-
-      {/* Related Products */}
-      <RelatedProduct
-        category={productData.Category}
-        subcategory={productData.SubCategory}
-        subsubcategory={productData.SubSubCategory}
-      />
     </div>
   );
 };
